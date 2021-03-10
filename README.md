@@ -19,14 +19,16 @@
 
 ## Overview
 
-- Analyses
-- Visualizations
-- Statistical Skills
 - API Retrieval (OpenweatherMap API)
+- Statistical Analyses
+- Visualizations
+- Weather Understanding
 
-Task: Collect and analyze weather data across cities worldwide.
-Purpose: Allow user's to search their own current weather and choose a preference and will match a different location.
-Method: Create a Pandas DataFrame with 1000 or more of the world's unique cities and their weather data in real time. This process will entail collecting, analyzing, and visualizing the data in Python, Tableau, and D3.
+Understand the domain https://en.wikipedia.org/wiki/Weather
+
+Task: Collect and analyze weather data across cities worldwide. Collect New York Cities weather in DETAIL.
+Purpose: Understanding weather data and in specific understanding New City's weather for another analysis project.
+Method: Create a Pandas DataFrame with 1000+ or more of the world's unique cities and their weather data in real time. This process will entail collecting, analyzing, and visualizing the data in Python, Tableau, and D3.
 Analysis: Data will be split into three main data building stages.
 
 ### Collect the Data
@@ -70,6 +72,10 @@ Analysis: Data will be split into three main data building stages.
   - Find a hotel from the cities' coordinates using Google's Maps and Places API, and Search Nearby feature.
   - Store the name of the first hotel in the DataFrame.
   - Add pop-up markers to the heatmap that display information about the city, current maximum temperature, and a hotel in the city.
+
+### New York City
+
+- https://en.wikipedia.org/wiki/Climate_of_New_York_City
 
 ## Summary
 

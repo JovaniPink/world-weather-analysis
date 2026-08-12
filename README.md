@@ -1,120 +1,150 @@
 # World Weather Analysis
 
-> World weather analysis.
+World Weather Analysis is a historical collection of notebooks, data snapshots,
+plots, and experiments exploring weather, geography, and travel questions. The
+repository also contains one maintained utility: a bounded Python client for
+Google Places API (New).
 
-## Data Sources
+The committed CSV files, workbooks, images, and notebook outputs are research
+artifacts from earlier exercises. They are not current observations, a
+reproducible weather pipeline, or an approved redistribution corpus.
 
-- https://openweathermap.org/current
-- https://www.ncdc.noaa.gov/cdo-web/
-- https://www.weather.gov/help-past-weather
-- https://www.weather.gov/
+## Repository map
 
-- New York City
+- `notebooks/` contains exploratory weather, vacation, and mapping notebooks.
+- `data/` contains historical weather snapshots.
+- `resources/` contains generated plots, notes, and workbook artifacts.
+- `world_weather/` contains the tested Places API (New) client and CLI.
+- `scripts/google_places_requests.py` remains a compatibility entry point for
+  the same CLI.
 
-  - https://www.ncdc.noaa.gov/cdo-web/datasets/GHCND/stations/GHCND:USW00094728/detail
-  - https://www1.nyc.gov/site/planning/data-maps/open-data/districts-download-metadata.page
-  -
+No notebook is executed in CI, and no live service is contacted during tests.
 
-- https://www.climate.gov/maps-data/dataset/past-weather-zip-code-data-table
+## Places API (New) client
 
-## Overview
+The previous script used the legacy Nearby Search and Place Details endpoints.
+The maintained client now follows Google’s current web-service contract:
 
-- API Retrieval (OpenweatherMap API)
-- Statistical Analyses
-- Visualizations
-- Weather Understanding
+- Nearby Search is one bounded `POST /v1/places:searchNearby` request.
+- Place Details is `GET /v1/places/{place_id}`.
+- every operation has an explicit, non-wildcard response field mask;
+- Nearby Search limits radius to 50 km and results to 20;
+- every HTTP request has a finite timeout;
+- transport, HTTP, JSON, and response-shape failures stop the command;
+- there is no hidden retry or legacy next-page loop.
 
-Understand the domain https://en.wikipedia.org/wiki/Weather
+This tool does not persist responses. Technical API access does not establish
+permission to store, display, combine, or redistribute Google place data.
+Review the applicable Google Maps Platform terms for the intended use.
 
-Task: Collect and analyze weather data across cities worldwide. Collect New York Cities weather in DETAIL.
-Purpose: Understanding weather data and in specific understanding New City's weather for another analysis project.
-Method: Create a Pandas DataFrame with 1000+ or more of the world's unique cities and their weather data in real time. This process will entail collecting, analyzing, and visualizing the data in Python, Tableau, and D3.
-Analysis: Data will be split into three main data building stages.
+### Set up
 
-### Collect the Data
+Requirements:
 
-- Use the NumPy module to generate more than 1,500 random latitudes and longitudes.
-- Use the citipy module to list the nearest city to the latitudes and longitudes.
-- Use the OpenWeatherMap API to request the current weather data from each unique city in your list.
-- Parse the JSON data from the API request.
-- Collect the following data from the JSON file and add it to a DataFrame:
-  - "City","Country","Date"
-  - "Lat","Lng"
-  - "Temp","Min Temp","Max Temp"
-  - "Current Description", "Current Details"
-  - "Humidity"
-  - "Cloudiness"
-  - "Wind Speed"
+- Python 3.14
+- [uv](https://docs.astral.sh/uv/) 0.12.3
+- a Google Cloud project with Places API (New) enabled
+- a restricted API key authorized only for the required API and environment
 
-### Exploratory Analysis with Visualization
+```bash
+python -m pip install uv==0.12.3
+uv sync --all-groups --frozen
+```
 
-- Create scatter plots of the weather data for the following comparisons:
-  - Latitude versus temperature
-  - Latitude versus humidity
-  - Latitude versus cloudiness
-  - Latitude versus wind speed
-- Determine the correlations for the following weather data:
-  - Latitude and temperature
-  - Latitude and humidity
-  - Latitude and cloudiness
-  - Latitude and wind speed
-- Create a series of heatmaps using the Google Maps and Places API that showcases the following:
-  - Latitude and temperature
-  - Latitude and humidity
-  - Latitude and cloudiness
-  - Latitude and wind speed
+`.env.example` documents the variable name but the client deliberately does not
+auto-load dotenv files. Do not commit `.env`, paste a key into source, or pass a
+key on the command line. Export it from a secret manager or the local shell:
 
-### Visualize Travel Data
+```bash
+export GOOGLE_PLACES_API_KEY='replace-with-a-restricted-key'
+```
 
-- Create a heatmap with pop-up markers that can display information on specific cities based on a customer's travel preferences. Complete these steps:
-  - Filter the Pandas DataFrame based on user inputs for a minimum and maximum temperature.
-  - Create a heatmap for the new DataFrame.
-  - Find a hotel from the cities' coordinates using Google's Maps and Places API, and Search Nearby feature.
-  - Store the name of the first hotel in the DataFrame.
-  - Add pop-up markers to the heatmap that display information about the city, current maximum temperature, and a hotel in the city.
+### Nearby Search
 
-### New York City
+```bash
+uv run weather-places nearby \
+  --latitude 28.4810971 \
+  --longitude -81.5089239 \
+  --radius-meters 500 \
+  --type restaurant \
+  --max-results 10
+```
 
-- https://en.wikipedia.org/wiki/Climate_of_New_York_City
+The default field mask requests identifiers, names, addresses, coordinates,
+types, and a Google Maps URI. Request only the fields the caller needs because
+Google uses field masks to determine returned data and billing. Explicit fields
+can be supplied without the `places.` prefix:
 
-## Summary
+```bash
+uv run weather-places nearby \
+  --latitude 40.754851 \
+  --longitude -73.984164 \
+  --radius-meters 50 \
+  --type transit_station \
+  --fields id,displayName,location
+```
 
-Grabbing Weather from an API using:
+Nearby Search (New) returns at most 20 results and does not expose the legacy
+`next_page_token`. The command performs one request only.
 
-- Jupyter Notebook
-- Python
-- Pandas
-- PandasGUI
-- CitiPy
-- Requests
-- APIs
-- Google Maps
-- OpenWeather API
-- JSON Traversals
+### Place Details
 
-### Weather Datasets
+```bash
+uv run weather-places details ChIJ8WvuSB7Lj4ARFyHppkxDRQ4 \
+  --fields id,displayName,formattedAddress,googleMapsUri
+```
 
-### Analysis
+The compatibility entry point invokes the same commands after the environment
+has been installed:
 
-## Todo Checklist
+```bash
+uv run python scripts/google_places_requests.py --help
+```
 
-A helpful checklist to gauge how your README is coming on what I would like to finish:
+## Quality and dependency gates
 
-- [ ] Lots of items! :)
+```bash
+./scripts/check.sh
+```
 
-## Contributing
+The gate checks the frozen lock, installs the exact Python 3.14 graph, runs Ruff
+lint and formatting, executes isolated fake-HTTP tests, smokes both CLI entry
+points, and audits resolved third-party dependencies for known vulnerabilities.
+`pyproject.toml` exact-pins direct runtime and quality dependencies; `uv.lock`
+captures the complete graph; Renovate monitors packages, uv, and digest-pinned
+GitHub Actions.
 
-Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
+## Historical analysis scope
 
-Please make sure to update tests as appropriate.
+The notebooks explored:
 
-1. Fork this repository;
-2. Create your branch: `git checkout -b my-new-feature`;
-3. Commit your changes: `git commit -m 'Add some feature'`;
-4. Push to the branch: `git push origin my-new-feature`.
+- OpenWeatherMap collection across generated city coordinates;
+- latitude relationships with temperature, humidity, cloudiness, and wind;
+- travel filtering and nearby-place experiments;
+- detailed New York City weather questions;
+- plots and maps produced from point-in-time snapshots.
 
-**After your pull request is merged**, you can safely delete your branch.
+They may depend on retired APIs, unstated package versions, local credentials,
+and mutable upstream data. Reproducing one requires a separate source, terms,
+environment, schema, and freshness review. Do not infer current weather from
+committed outputs.
+
+## Release and rollback boundary
+
+Merging this repository changes source and CI only. It does not enable an API,
+create a key, call Google, deploy a service, or migrate stored data. Rollback is
+a normal source revert. Key creation, restriction, rotation, quota, billing, and
+any production execution remain explicit Google Cloud owner actions.
+
+## Official references
+
+- [Migrate to Places API (New)](https://developers.google.com/maps/documentation/places/web-service/legacy/migrate-overview)
+- [Nearby Search (New)](https://developers.google.com/maps/documentation/places/web-service/nearby-search)
+- [Place Details (New)](https://developers.google.com/maps/documentation/places/web-service/place-details)
+- [Choose response fields](https://developers.google.com/maps/documentation/places/web-service/choose-fields)
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for more information.
+Original repository code and documentation are licensed under the
+[MIT License](LICENSE.md). Third-party data, maps, images, and service responses
+remain subject to their own terms.

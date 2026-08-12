@@ -1,0 +1,38 @@
+[build-system]
+requires = ["hatchling==1.32.0"]
+build-backend = "hatchling.build"
+
+[project]
+name = "world-weather-analysis"
+version = "0.1.0"
+description = "Bounded Places API client for a historical weather research archive"
+readme = "README.md"
+requires-python = ">=3.14,<3.15"
+license = "MIT"
+dependencies = [
+  "requests==2.34.2",
+]
+
+[project.scripts]
+weather-places = "world_weather.cli:main"
+
+[dependency-groups]
+dev = [
+  "pip-audit==2.10.1",
+  "pytest==9.1.1",
+  "ruff==0.16.2",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["world_weather"]
+
+[tool.pytest.ini_options]
+addopts = "--strict-config --strict-markers"
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 88
+target-version = "py314"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]

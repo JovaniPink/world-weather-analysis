@@ -119,7 +119,6 @@ class PlacesClient:
         *,
         session: Any | None = None,
         timeout_seconds: float = DEFAULT_TIMEOUT_SECONDS,
-        base_url: str = PLACES_BASE_URL,
     ) -> None:
         key = api_key.strip()
         if not key:
@@ -133,7 +132,6 @@ class PlacesClient:
             maximum=120,
             minimum_inclusive=False,
         )
-        self._base_url = base_url.rstrip("/")
 
     @classmethod
     def from_env(
@@ -249,7 +247,7 @@ class PlacesClient:
         try:
             response = self._session.request(
                 method,
-                f"{self._base_url}{path}",
+                f"{PLACES_BASE_URL}{path}",
                 headers=headers,
                 json=dict(payload) if payload is not None else None,
                 timeout=self._timeout_seconds,

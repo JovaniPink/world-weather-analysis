@@ -30,6 +30,8 @@ The maintained client now follows Google’s current web-service contract:
 - every operation has an explicit, non-wildcard response field mask;
 - Nearby Search limits radius to 50 km and results to 20;
 - every HTTP request has a finite timeout;
+- the credential-bearing origin is fixed to `https://places.googleapis.com/v1`
+  and cannot be redirected through a caller-supplied base URL;
 - transport, HTTP, JSON, and response-shape failures stop the command;
 - there is no hidden retry or legacy next-page loop.
 
@@ -42,12 +44,12 @@ Review the applicable Google Maps Platform terms for the intended use.
 Requirements:
 
 - Python 3.14
-- [uv](https://docs.astral.sh/uv/) 0.12.3
+- [uv](https://docs.astral.sh/uv/) 0.12.5
 - a Google Cloud project with Places API (New) enabled
 - a restricted API key authorized only for the required API and environment
 
 ```bash
-python -m pip install uv==0.12.3
+python -m pip install uv==0.12.5
 uv sync --all-groups --frozen
 ```
 
@@ -112,7 +114,8 @@ lint and formatting, executes isolated fake-HTTP tests, smokes both CLI entry
 points, and audits resolved third-party dependencies for known vulnerabilities.
 `pyproject.toml` exact-pins direct runtime and quality dependencies; `uv.lock`
 captures the complete graph; Renovate monitors packages, uv, and digest-pinned
-GitHub Actions.
+GitHub Actions. CI installs uv 0.12.5 through the commit-pinned official
+`astral-sh/setup-uv` action instead of executing a mutable `pip install` step.
 
 ## Historical analysis scope
 
@@ -142,6 +145,8 @@ any production execution remain explicit Google Cloud owner actions.
 - [Nearby Search (New)](https://developers.google.com/maps/documentation/places/web-service/nearby-search)
 - [Place Details (New)](https://developers.google.com/maps/documentation/places/web-service/place-details)
 - [Choose response fields](https://developers.google.com/maps/documentation/places/web-service/choose-fields)
+- [Set up and restrict a Places API key](https://developers.google.com/maps/documentation/places/web-service/get-api-key)
+- [Use uv in GitHub Actions](https://docs.astral.sh/uv/guides/integration/github/)
 
 ## License
 

@@ -169,6 +169,15 @@ def test_from_env_passes_key_without_exposing_it(
     assert session.calls[0]["headers"]["X-Goog-Api-Key"] == "environment-secret"
 
 
+def test_client_does_not_accept_a_custom_credential_destination() -> None:
+    with pytest.raises(TypeError, match="base_url"):
+        PlacesClient(  # type: ignore[call-arg]
+            "secret",
+            session=FakeSession(),
+            base_url="https://example.invalid/v1",
+        )
+
+
 def test_transport_errors_are_wrapped_without_the_key() -> None:
     session = FakeSession(error=requests.Timeout("wire timeout"))
     client = PlacesClient("secret", session=session)

@@ -251,6 +251,7 @@ class PlacesClient:
                 headers=headers,
                 json=dict(payload) if payload is not None else None,
                 timeout=self._timeout_seconds,
+                allow_redirects=False,
             )
         except requests.RequestException as error:
             raise PlacesApiError(

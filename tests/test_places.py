@@ -178,6 +178,40 @@ def test_client_does_not_accept_a_custom_credential_destination() -> None:
         )
 
 
+def test_redirect_cannot_forward_the_api_key_to_another_origin() -> None:
+    class RedirectAdapter(requests.adapters.BaseAdapter):
+        def __init__(self) -> None:
+            self.destinations: list[str] = []
+
+        def send(self, request: Any, **kwargs: Any) -> requests.Response:
+            self.destinations.append(request.url)
+            response = requests.Response()
+            response.request = request
+            response.url = request.url
+            if len(self.destinations) == 1:
+                response.status_code = 302
+                response.headers["Location"] = "https://other.example.invalid/places"
+                response._content = b"{}"
+            else:
+                response.status_code = 200
+                response._content = b'{"id":"redirected"}'
+            return response
+
+        def close(self) -> None:
+            pass
+
+    adapter = RedirectAdapter()
+    with requests.Session() as session:
+        session.trust_env = False
+        session.mount("https://", adapter)
+        client = PlacesClient("synthetic-test-key", session=session)
+
+        with pytest.raises(PlacesApiError, match="HTTP 302"):
+            client.place_details("ChIJ123", fields=("id",))
+
+    assert adapter.destinations == ["https://places.googleapis.com/v1/places/ChIJ123"]
+
+
 def test_transport_errors_are_wrapped_without_the_key() -> None:
     session = FakeSession(error=requests.Timeout("wire timeout"))
     client = PlacesClient("secret", session=session)

@@ -258,17 +258,23 @@ class PlacesClient:
                 "Places API request failed at the transport layer"
             ) from error
 
+        status_code = getattr(response, "status_code", None)
+        if not isinstance(status_code, int):
+            raise PlacesApiError("Places API response did not include an HTTP status")
+        if 300 <= status_code < 400:
+            raise PlacesApiError(
+                f"Places API returned HTTP {status_code}: redirect rejected",
+                status_code=status_code,
+            )
+
         try:
             body = response.json()
         except ValueError as error:
             raise PlacesApiError(
                 "Places API returned a non-JSON response",
-                status_code=getattr(response, "status_code", None),
+                status_code=status_code,
             ) from error
 
-        status_code = getattr(response, "status_code", None)
-        if not isinstance(status_code, int):
-            raise PlacesApiError("Places API response did not include an HTTP status")
         if not 200 <= status_code < 300:
             message = "request rejected"
             if isinstance(body, dict):

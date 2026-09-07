@@ -191,7 +191,7 @@ def test_redirect_cannot_forward_the_api_key_to_another_origin() -> None:
             if len(self.destinations) == 1:
                 response.status_code = 302
                 response.headers["Location"] = "https://other.example.invalid/places"
-                response._content = b"{}"
+                response._content = b""
             else:
                 response.status_code = 200
                 response._content = b'{"id":"redirected"}'

@@ -31,7 +31,7 @@ The maintained client now follows Google’s current web-service contract:
 - Nearby Search limits radius to 50 km and results to 20;
 - every HTTP request has a finite timeout;
 - the credential-bearing origin is fixed to `https://places.googleapis.com/v1`
-  and cannot be redirected through a caller-supplied base URL;
+  with HTTP redirects disabled and no caller-supplied base URL;
 - transport, HTTP, JSON, and response-shape failures stop the command;
 - there is no hidden retry or legacy next-page loop.
 

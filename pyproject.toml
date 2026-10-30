@@ -20,7 +20,7 @@ weather-places = "world_weather.cli:main"
 dev = [
   "pip-audit==2.10.1",
   "pytest==9.1.1",
-  "ruff==0.16.2",
+  "ruff==0.17.3",
 ]
 
 [tool.hatch.build.targets.wheel]

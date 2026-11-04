@@ -1,5 +1,18 @@
 # World Weather Analysis
 
+## Personal platform decision — November 3, 2026
+
+The owner-selected Google Cloud project for all personal deployments is
+[`jovanipink`](https://console.cloud.google.com/welcome?project=jovanipink).
+Use the [Netlify `jovanipink` team](https://app.netlify.com/teams/jovanipink/projects)
+for web publishing and [Clerk](https://dashboard.clerk.com/apps) for application
+identity when accounts are needed. Separate products and environments through
+resource names, scoped identities, data boundaries and Terraform state; do not
+create a GCP project per product or environment. This decision supersedes older
+platform-selection prose. It does not establish that integrations are implemented
+or authorize a deployment. Static sites and local-only apps need no added login.
+
+
 World Weather Analysis is a historical collection of notebooks, data snapshots,
 plots, and experiments exploring weather, geography, and travel questions. The
 repository also contains one maintained utility: a bounded Python client for
